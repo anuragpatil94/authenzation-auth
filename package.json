@@ -1,0 +1,52 @@
+{
+  "name": "authenzation-auth",
+  "version": "1.0.0",
+  "description": "The is a React Application to understand the flow of Authentication Methods",
+  "main": "src/app.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "pg-promise": "^10.6.1",
+    "@hapi/joi": "^17.1.1",
+    "@types/hapi__joi": "^16.0.12",
+    "bcrypt": "^4.0.1",
+    "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "mongodb": "^3.5.5",
+    "morgan": "^1.9.1",
+    "response-time": "^2.3.2",
+    "uuid": "^7.0.2",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-export-namespace-from": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.13",
+    "prettier": "^2.1.1",
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "start": "babel-node src/app.js",
+    "dev": "nodemon --exec babel-node src/app.js",
+    "precommit": "lint-staged",
+    "format": "prettier --write \"**/*.+(js|md|ts|css|sass|less|graphql|yml|yaml|scss|json|vue)\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anuragpatil94/authenzation-auth.git"
+  },
+  "author": "Anurag Patil",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anuragpatil94/authenzation-auth/issues"
+  },
+  "homepage": "https://github.com/anuragpatil94/authenzation-auth#readme"
+}
