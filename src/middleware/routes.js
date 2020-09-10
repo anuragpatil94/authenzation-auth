@@ -1,9 +1,9 @@
 import configs from '../config';
-import routes from '../api/routes';
 import { Logger } from './logger';
 import { APIRoutes } from '../api';
 
 export default ({ app }) => {
+  // All Routes
   app.use(configs.routesConfig.routePrefix, APIRoutes.Routes());
 
   // catch 404 and forward to error handler

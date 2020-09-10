@@ -1,34 +1,40 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
+// Node Environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-let config = dotenv.config();
+// Get COnfig File
+const envFileName = `.env.${process.env.NODE_ENV}`;
+let config = dotenv.config({ path: path.resolve(process.cwd(), envFileName) });
 
 if (!config) {
   throw new Error('Configurations Not Found');
 }
 
 export default {
-  port: parseInt(process.env.NODE_SERVER_PORT) || 4000,
+  port: parseInt(config.parsed.NODE_SERVER_PORT) || 4000,
   loggerConfig: {
-    logLevel: process.env.LOG_LEVEL || 'silly',
-    infoColor: process.env.INFO_COLOR || 'blue',
-    debugColor: process.env.DEBUG_COLOR || 'magenta',
-    warningColor: process.env.WARNING_COLOR || 'yellow',
-    errorColor: process.env.ERROR_COLOR || 'red',
+    logLevel: config.parsed.LOG_LEVEL || 'silly',
+    infoColor: config.parsed.INFO_COLOR || 'blue',
+    debugColor: config.parsed.DEBUG_COLOR || 'magenta',
+    warningColor: config.parsed.WARNING_COLOR || 'yellow',
+    errorColor: config.parsed.ERROR_COLOR || 'red',
   },
   routesConfig: {
-    routePrefix: process.env.ROUTE_PREFIX || '/api/v1',
+    routePrefix: config.parsed.ROUTE_PREFIX || '/api/v1',
   },
   databaseConfig: {
-    mongoURI: process.env.MONGO_URI,
-    mongoUser: process.env.MONGO_USERNAME,
-    mongoPassword: process.env.MONGO_PASSWORD,
-    mongoDbName: process.env.MONGO_DATABASE_NAME,
+    authHost: config.parsed.PGSQL_AUTH_HOST,
+    authPort: config.parsed.PGSQL_AUTH_PORT,
+    authMaxConnections: config.parsed.PGSQL_AUTH_MAX_CONNECTIONS || 30,
+    authUsername: config.parsed.PGSQL_AUTH_USERNAME,
+    authPassword: config.parsed.PGSQL_AUTH_PASSWORD,
+    authDatabaseName: config.parsed.PGSQL_AUTH_DATABASE_NAME,
   },
-  jwt: {
-    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
-    accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRATION,
-    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-  },
+  // jwt: {
+  //   accessTokenSecret: config.parsed.ACCESS_TOKEN_SECRET,
+  //   accessTokenExpiration: config.parsed.ACCESS_TOKEN_EXPIRATION,
+  //   refreshTokenSecret: config.parsed.REFRESH_TOKEN_SECRET,
+  // },
 };
