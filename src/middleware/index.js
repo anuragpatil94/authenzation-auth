@@ -5,11 +5,8 @@ import { databaseConnection } from './database';
 export default async ({ app }) => {
   try {
     // Load Database
-    const db = await databaseConnection();
-    if (db) {
-      Logger.info('Loaded And Connected Database!');
-    }
-    //   Load Model
+    await databaseConnection();
+    Logger.info('Loaded And Connected Database!');
 
     // Load Middlewares
     loadExpress({ app });
