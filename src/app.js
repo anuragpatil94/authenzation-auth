@@ -16,8 +16,10 @@ import { Logger } from './middleware/logger';
   const app = express();
 
   // Initiate loading middleware
+  Logger.info('Initiating Loading Middleware...');
   let middleware = await import('./middleware');
   await middleware.default({ app });
+  Logger.info('All Middlewares Loaded!');
 
   // Start server on open port
   app.listen(port, err => {

@@ -6,7 +6,7 @@ export default async ({ app }) => {
   try {
     // Load Database
     await databaseConnection();
-    Logger.info('Loaded And Connected Database!');
+    Logger.info('Database Connection Successful');
 
     // Load Middlewares
     loadExpress({ app });
@@ -16,6 +16,7 @@ export default async ({ app }) => {
     loadRoutes({ app });
     Logger.info('Loaded Routes');
   } catch (err) {
-    Logger.error(err);
+    console.dir(err.message);
+    // Logger.error(`${fileName}:${lineNumber}: ${message}`);
   }
 };
