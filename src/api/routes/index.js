@@ -7,7 +7,7 @@ export const Routes = () => {
   /**
    * Health check of API
    */
-  app.get('/status', (req, res, next) => {
+  app.get('/', (req, res, next) => {
     res.status(200).json({
       message: 'You are accessing `api/v1` !!',
     });

@@ -9,6 +9,7 @@ export const signup = async (req, res, next) => {
   try {
     // Get data from the request
     const requestData = req.body;
+    console.log(requestData);
 
     // Check if user exist
     const user = await userServices.findUserByUsername(requestData.username);

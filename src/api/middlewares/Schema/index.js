@@ -2,23 +2,23 @@ import Joi from '@hapi/joi';
 import { constants } from '../../../util';
 
 class Schema {
-  constructor(schema, keys) {
+  constructor(schema, requestDataMapping) {
     this.schema = schema;
-    this.keys = keys;
+    this.requestDataMapping = requestDataMapping;
   }
 }
 
 const SignUpSchema = Joi.object({
   firstName: Joi.string().alphanum().required(),
   lastName: Joi.string().alphanum().required(),
-  middleName: Joi.string().alphanum(),
+  // middleName: Joi.string().alphanum(),
   username: Joi.string().alphanum().required(),
   password: Joi.string().min(6).required().strict(),
-  confirmPassword: Joi.string().valid(Joi.ref('password')).required().strict(),
+  // confirmPassword: Joi.string().valid(Joi.ref('password')).required().strict(),
 });
 
 const SignInSchema = Joi.object({
-  authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
+  // authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
   username: Joi.string().alphanum().required(),
   password: Joi.string().required().strict(),
 });
@@ -28,14 +28,14 @@ export default {
     body: [
       'firstName',
       'lastName',
-      'middleName',
+      // 'middleName',
       'username',
       'password',
-      'confirmPassword',
+      // 'confirmPassword',
     ],
   }),
   [constants.APIROUTES.AUTH.SIGNIN]: new Schema(SignInSchema, {
-    headers: ['authtype'],
+    // headers: ['authtype'],
     body: ['username', 'password'],
   }),
 };

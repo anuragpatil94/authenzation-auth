@@ -14,7 +14,8 @@ export default ({ app }) => {
     next();
   });
 
-  //Regex for user-agent future use - /(mozilla|AppleWebKit|firefox|msie|chrome|safari)[/\s]([\d.]+)/g
+  //Regex for user-agent future use -
+  //(mozilla|AppleWebKit|firefox|msie|chrome|safari)[/\s]([\d.]+)/g
 
   /**
    * Custom morgan log -> stream to winston

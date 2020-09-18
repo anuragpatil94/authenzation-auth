@@ -27,13 +27,16 @@ export const SchemaValidator = async (req, res, next) => {
       // get schema for the current route
       const SchemaClass = _.get(Schema, route);
       const _schema = SchemaClass.schema;
-      const keys = SchemaClass.keys;
 
-      // Create a body object based on all the request inputs from body,headers,params
+      // data mapping for body, headers, params
+      const requestDataMapping = SchemaClass.requestDataMapping;
+
+      // Create a body object based on all the request inputs from
+      // body,headers,params
       let body = {};
-      for (const key in keys) {
-        if (keys.hasOwnProperty(key)) {
-          const value = keys[key];
+      for (const key in requestDataMapping) {
+        if (requestDataMapping.hasOwnProperty(key)) {
+          const value = requestDataMapping[key];
           const formattedObject = _.pick(req[key], value);
           body = { ...body, ...formattedObject };
         }
