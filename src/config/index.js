@@ -2,9 +2,10 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 // Node Environment
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV || '';
+process.env.NODE_ENV = ENV.toLowerCase() || 'development';
 
-// Get COnfig File
+// Get Config File
 const envFileName = `.env.${process.env.NODE_ENV}`;
 let config = dotenv.config({ path: path.resolve(process.cwd(), envFileName) });
 
@@ -13,6 +14,10 @@ if (!config) {
 }
 
 export default {
+  env: {
+    isProduction: process.env.NODE_ENV === 'production',
+    isDevelopment: process.env.NODE_ENV === 'development',
+  },
   port: parseInt(config.parsed.NODE_SERVER_PORT) || 4000,
   loggerConfig: {
     logLevel: config.parsed.LOG_LEVEL || 'silly',

@@ -1,27 +1,26 @@
 import pgsql from 'pg-promise';
 import config from '../config';
 import { Logger } from './logger';
-import { constants } from '../util';
 
-export const databaseConnection = async () => {
-  try {
-    const dbObj = pgsql({
-      query(e) {
-        Logger.debug(e.query);
-      },
-    })({
-      host: config.databaseConfig.authHost,
-      port: config.databaseConfig.authPort,
-      database: config.databaseConfig.authDatabaseName,
-      user: config.databaseConfig.authUsername,
-      password: config.databaseConfig.authPassword,
-      max: config.databaseConfig.authMaxConnections,
-    });
-
-    return await dbObj.connect();
-  } catch (err) {
-    Logger.error(err.message);
-    Logger.error('Connection to database failed!!');
-    return 0;
-  }
-};
+export const db = pgsql({
+  error(error, e) {
+    if (e.cn) {
+      Logger.error(`Cannot connect to database`);
+      if (config.env.isDevelopment) {
+        Logger.debug(error.message);
+      }
+    }
+  },
+  query(e) {
+    if (config.env.isDevelopment) {
+      Logger.debug(`Query: ${e.query}`);
+    }
+  },
+})({
+  host: config.databaseConfig.authHost,
+  port: config.databaseConfig.authPort,
+  database: config.databaseConfig.authDatabaseName,
+  user: config.databaseConfig.authUsername,
+  password: config.databaseConfig.authPassword,
+  max: config.databaseConfig.authMaxConnections,
+});

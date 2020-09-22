@@ -1,11 +1,16 @@
 import loadExpress from './express';
 import loadLoggers, { Logger } from './logger';
 import loadRoutes from './routes';
-import { databaseConnection } from './database';
+import { db } from './database';
 export default async ({ app }) => {
   try {
     // Load Database
-    await databaseConnection();
+    const c = await db.connect();
+    c.done();
+
+    if (!c.client.serverVersion) {
+      throw new Error('Cannot Connect to Database');
+    }
     Logger.info('Database Connection Successful');
 
     // Load Middlewares
@@ -16,7 +21,7 @@ export default async ({ app }) => {
     loadRoutes({ app });
     Logger.info('Loaded Routes');
   } catch (err) {
-    Logger.error(err.message);
+    console.dir(err.message);
     // Logger.error(`${fileName}:${lineNumber}: ${message}`);
   }
 };

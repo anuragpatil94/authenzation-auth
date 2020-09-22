@@ -5,7 +5,7 @@ import config from './config';
 import { Logger } from './middleware/logger';
 
 (async () => {
-  if (process.env.NODE_ENV == 'development') {
+  if (config.env.isDevelopment) {
     Logger.info('App running on Development Environment');
   }
 
