@@ -27,8 +27,9 @@ export default ({ app }) => {
   });
 
   app.use((err, req, res, next) => {
-    Logger.debug(`Error Middleware: ${err.status} \n ${err.stack}`);
-    res.status(err.status || 500).json({
+    const statusCode = err.status || 500;
+    Logger.debug(`Error Middleware: ${statusCode} \n ${err.stack}`);
+    res.status(statusCode).json({
       errors: {
         message: err.message,
       },

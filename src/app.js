@@ -28,6 +28,6 @@ import { Logger } from './middleware/logger';
       process.exit(1);
       return;
     }
-    console.log(`Server started at http://localhost:${port}`);
+    Logger.info(`Server started at http://localhost:${port}`);
   });
 })();
