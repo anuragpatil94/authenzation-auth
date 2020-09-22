@@ -16,7 +16,7 @@ export default async ({ app }) => {
     loadRoutes({ app });
     Logger.info('Loaded Routes');
   } catch (err) {
-    console.dir(err.message);
+    Logger.error(err.message);
     // Logger.error(`${fileName}:${lineNumber}: ${message}`);
   }
 };

@@ -5,7 +5,11 @@ import { constants } from '../util';
 
 export const databaseConnection = async () => {
   try {
-    const dbObj = pgsql()({
+    const dbObj = pgsql({
+      query(e) {
+        Logger.debug(e.query);
+      },
+    })({
       host: config.databaseConfig.authHost,
       port: config.databaseConfig.authPort,
       database: config.databaseConfig.authDatabaseName,
