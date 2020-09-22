@@ -1,10 +1,7 @@
-import bcrypt from 'bcrypt';
-
-import { databaseConnection } from '../middleware/database';
+import { v4 } from 'uuid';
 import { Logger } from '../middleware/logger';
 import { InternalServerError, constants } from '../util';
-
-const COLLECTION = constants.COLLECTION.USERS;
+import { databaseConnection } from '../middleware/database';
 
 export const createUser = async userData => {
   try {
@@ -12,35 +9,48 @@ export const createUser = async userData => {
     const db = await databaseConnection();
 
     // Create document to be inserted to the database
-    const newUser = await createUserDocument(userData);
+    const newUser = {
+      userId: v4(),
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      username: userData.username,
+      password: userData.password,
+    };
 
     // Insert newUser to the database
-    const insertOperation = await db.collection(COLLECTION).insertOne(newUser);
+    const insertOperation = await db.query(
+      'insert into  users ("UserId", "FirstName", "LastName", "Username", "Password")  values (${userId}, ${firstName}, ${lastName}, ${username}, ${password} ) returning "UserId";',
+      newUser,
+    );
+
+    const lastInsertedId = insertOperation[0].UserId || false;
 
     // Check if the data is inserted or not.
-    if (!insertOperation.result.ok) {
+    if (!lastInsertedId) {
       throw new InternalServerError('Cannot create user');
     }
 
     Logger.info('User document inserted in database');
 
-    return insertOperation.insertedId;
+    return lastInsertedId;
   } catch (err) {
+    Logger.error(err.message);
     throw err;
   }
 };
 
 export const findUserByUsername = async username => {
   try {
+    // Create database Instance
     const db = await databaseConnection();
 
-    // TODO: Remove this later. added for testing.
-    // await db.collection(COLLECTION).deleteOne({ username: username });
+    const user = await db.query(
+      `select * from users where "Username"='${username}'`,
+      { username },
+    );
 
-    const user = await db.collection(COLLECTION).findOne({ username });
-
-    if (!user) return false;
-    return user;
+    if (user && user.length > 0) return user;
+    return false;
   } catch (error) {
     Logger.error(error.message);
     throw error;
@@ -51,22 +61,13 @@ export const findUserById = () => {};
 
 export const findAllUsers = () => {};
 
-/**
- * Gets the UserId of the User after matching the Username and Password of the user
- * @param {string} username username recieved from API Request
- * @param {string} password password in plain text from API Request
- *
- * @returns {string|boolean} returns _id if user is verified else returns false
- */
-export const verifyUser = async (username, password) => {
+export const deleteUser = async username => {
   try {
-    const user = await findUserByUsername(username);
-
-    const isUserValid = await verifyPassword(password, user.password);
-    if (isUserValid) {
-      return user._id;
-    }
-    return false;
+    // Create database Instance
+    const db = await databaseConnection();
+    await db.query(`delete from users where "Username"='${username}';`, {
+      username,
+    });
   } catch (error) {
     Logger.error(error.message);
     throw error;
@@ -98,22 +99,4 @@ const createUserDocument = async ({ username, password, ...details }) => {
 
   Logger.info('User document Created');
   return user;
-};
-
-const encryptPassword = async password => {
-  // Salt Rounds to generate Salt
-  const saltRounds = 10;
-
-  // Generate Salt
-  const salt = await bcrypt.genSalt(saltRounds);
-  // Generate Hashed Password based on salt
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  return { salt, hashedPassword };
-};
-
-const verifyPassword = async (password, hash) => {
-  // Comparing request password with the database stored hash password
-  const result = await bcrypt.compare(password, hash);
-  return result;
 };

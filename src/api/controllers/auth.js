@@ -9,7 +9,9 @@ export const signup = async (req, res, next) => {
   try {
     // Get data from the request
     const requestData = req.body;
-    console.log(requestData);
+
+    // TODO: Debug Operation for Development phase
+    await userServices.deleteUser(requestData.username);
 
     // Check if user exist
     const user = await userServices.findUserByUsername(requestData.username);
@@ -40,7 +42,7 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res, next) => {
   try {
     // TODO: Use AuthType
-    const authType = req.body.authtype;
+    // const authType = req.body.authtype;
 
     // Verify if user is in database and correct credentials
     const userId = await userServices.verifyUser(
@@ -53,7 +55,7 @@ export const signin = async (req, res, next) => {
       throw new ErrorHandler(401, 'User Credentials Invalid!');
     }
 
-    // TODO: TOKEN MAGIC
+    // TODO: TOKEN
     // TODO: Step1 - JWT
 
     const user = {
