@@ -10,9 +10,9 @@ export const signup = async (req, res, next) => {
     // Get data from the request
     const requestData = req.body;
 
-    // TODO: Debug Operation for Development phase
-    await userServices.deleteUser(requestData.username);
-
+    if (config.env.isDevelopment) {
+      await userServices.deleteUser(requestData.username);
+    }
     // Check if user exist
     const user = await userServices.findUserByUsername(requestData.username);
 
