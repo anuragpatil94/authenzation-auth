@@ -1,25 +1,31 @@
 import { v4 } from 'uuid';
 import { Logger } from '../middleware/logger';
-import { InternalServerError, constants } from '../util';
-import { databaseConnection } from '../middleware/database';
+import { InternalServerError } from '../util';
+import { db } from '../middleware/database';
+import { authServices } from '.';
 
-export const createUser = async userData => {
+export const createUser = async ({
+  firstName,
+  lastName,
+  username,
+  password,
+}) => {
   try {
-    // Create database Instance
-    const db = await databaseConnection();
-
     // Create document to be inserted to the database
+    const { salt, hashedPassword } = await authServices.encryptPassword(
+      password,
+    );
     const newUser = {
       userId: v4(),
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      username: userData.username,
-      password: userData.password,
+      firstName: firstName,
+      lastName: lastName,
+      username: username,
+      password: hashedPassword,
     };
 
     // Insert newUser to the database
     const insertOperation = await db.query(
-      'insert into  users ("UserId", "FirstName", "LastName", "Username", "Password")  values (${userId}, ${firstName}, ${lastName}, ${username}, ${password} ) returning "UserId";',
+      'insert into users ("UserId", "FirstName", "LastName", "Username", "Password") values (${userId}, ${firstName}, ${lastName}, ${username}, ${password} ) returning "UserId";',
       newUser,
     );
 
@@ -41,9 +47,6 @@ export const createUser = async userData => {
 
 export const findUserByUsername = async username => {
   try {
-    // Create database Instance
-    const db = await databaseConnection();
-
     const user = await db.query(
       `select * from users where "Username"='${username}'`,
       { username },
@@ -63,8 +66,6 @@ export const findAllUsers = () => {};
 
 export const deleteUser = async username => {
   try {
-    // Create database Instance
-    const db = await databaseConnection();
     await db.query(`delete from users where "Username"='${username}';`, {
       username,
     });
@@ -72,31 +73,4 @@ export const deleteUser = async username => {
     Logger.error(error.message);
     throw error;
   }
-};
-
-/*
-Helper Methods
-*/
-
-const createUserDocument = async ({ username, password, ...details }) => {
-  // Encrypt Password
-  const { salt, hashedPassword } = await encryptPassword(password);
-
-  // TODO: Added new fields
-  // User Document
-  const user = {
-    username,
-    password: hashedPassword,
-    details: {
-      firstName: details.firstName,
-      lastName: details.lastName,
-      ...(details.middleName && { middleName: details.middleName }),
-    },
-    salt,
-    userLevel: constants.USER.USERLEVEL.GENERAL,
-    createdAt: new Date(),
-  };
-
-  Logger.info('User document Created');
-  return user;
 };
