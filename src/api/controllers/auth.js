@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { userServices } from '../../services';
+import { authServices, userServices } from '../../services';
 import { Logger } from '../../middleware/logger';
 import { ErrorHandler } from '../../util';
 import config from '../../config';
@@ -9,12 +9,13 @@ export const signup = async (req, res, next) => {
   try {
     // Get data from the request
     const requestData = req.body;
+    const { username } = requestData;
 
     if (config.env.isDevelopment) {
-      await userServices.deleteUser(requestData.username);
+      await userServices.deleteUser(username);
     }
     // Check if user exist
-    const user = await userServices.findUserByUsername(requestData.username);
+    const user = await userServices.findUserByUsername(username);
 
     // Handle duplicate user exception
     if (user) {
@@ -41,14 +42,13 @@ export const signup = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   try {
+    const requestData = req.body;
+    const { username, password } = requestData;
     // TODO: Use AuthType
-    // const authType = req.body.authtype;
+    // const authType = authtype;
 
     // Verify if user is in database and correct credentials
-    const userId = await userServices.verifyUser(
-      req.body.username,
-      req.body.password,
-    );
+    const userId = authServices.verifyUser(username, password);
 
     // Throw error if User is not received.
     if (!userId) {
@@ -58,20 +58,19 @@ export const signin = async (req, res, next) => {
     // TODO: TOKEN
     // TODO: Step1 - JWT
 
-    const user = {
-      _id: userId,
-      username: req.body.username,
-    };
+    // const user = {
+    //   _id: userId,
+    //   username: username,
+    // };
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    // const accessToken = generateAccessToken(user);
+    // const refreshToken = generateRefreshToken(user);
 
     // TODO: Step2 - Session
     // TODO: Step3 - Basic
 
-    res
-      .status(200)
-      .json({ success: true, data: { accessToken, refreshToken } });
+    res.status(200).json({ success: true, data: {} });
+    // .json({ success: true, data: { accessToken, refreshToken } });
   } catch (err) {
     next(err);
   }

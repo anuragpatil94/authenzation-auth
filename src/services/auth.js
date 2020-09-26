@@ -1,6 +1,6 @@
-import { databaseConnection } from '../middleware/database';
+import bcrypt from 'bcrypt';
+
 import { Logger } from '../middleware/logger';
-import { constants } from '../util';
 import { findUserByUsername } from './user';
 
 /**
@@ -10,13 +10,16 @@ import { findUserByUsername } from './user';
  *
  * @returns {string|boolean} returns _id if user is verified else returns false
  */
-export const verifyUser = async (username, password) => {
+const verifyUser = async (username, password) => {
   try {
-    const user = await findUserByUsername(username);
+    const [user] = await findUserByUsername(username);
+    if (!user) {
+      return false;
+    }
 
-    const isUserValid = await verifyPassword(password, user.password);
+    const isUserValid = await verifyPassword(password, user.Password);
     if (isUserValid) {
-      return user._id;
+      return user.UserId;
     }
     return false;
   } catch (error) {
@@ -42,3 +45,5 @@ const verifyPassword = async (password, hash) => {
   const result = await bcrypt.compare(password, hash);
   return result;
 };
+
+export { verifyUser, encryptPassword };
