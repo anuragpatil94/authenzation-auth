@@ -55,8 +55,9 @@ export const signin = async (req, res, next) => {
       throw new ErrorHandler(401, 'User Credentials Invalid!');
     }
 
-    // TODO: TOKEN
     // TODO: Step1 - JWT
+    // TODO: Step2 - Session
+    // TODO: Step3 - Cookie Authentication
 
     // const user = {
     //   _id: userId,
@@ -65,9 +66,6 @@ export const signin = async (req, res, next) => {
 
     // const accessToken = generateAccessToken(user);
     // const refreshToken = generateRefreshToken(user);
-
-    // TODO: Step2 - Session
-    // TODO: Step3 - Basic
 
     res.status(200).json({ success: true, data: {} });
     // .json({ success: true, data: { accessToken, refreshToken } });
