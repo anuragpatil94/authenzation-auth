@@ -4,18 +4,19 @@ import { authServices, userServices } from '../../services';
 import { Logger } from '../../middleware/logger';
 import { ErrorHandler } from '../../util';
 import config from '../../config';
+import { create } from 'lodash';
 
 export const signup = async (req, res, next) => {
   try {
     // Get data from the request
     const requestData = req.body;
-    const { username } = requestData;
+    const { Username } = requestData;
 
     if (config.env.isDevelopment) {
-      await userServices.deleteUser(username);
+      await userServices.deleteUser(Username);
     }
     // Check if user exist
-    const user = await userServices.findUserByUsername(username);
+    const user = await userServices.findUserByUsername(Username);
 
     // Handle duplicate user exception
     if (user) {
@@ -43,15 +44,18 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res, next) => {
   try {
     const requestData = req.body;
-    const { username, password } = requestData;
+    const { Username, Password } = requestData;
     // TODO: Use AuthType
     // const authType = authtype;
 
     // Verify if user is in database and correct credentials
-    const userId = authServices.verifyUser(username, password);
+    const { UserId, FirstName, LastName } = await authServices.verifyUser(
+      Username,
+      Password,
+    );
 
     // Throw error if User is not received.
-    if (!userId) {
+    if (!UserId) {
       throw new ErrorHandler(401, 'User Credentials Invalid!');
     }
 
@@ -59,15 +63,12 @@ export const signin = async (req, res, next) => {
     // TODO: Step2 - Session
     // TODO: Step3 - Cookie Authentication
 
-    // const user = {
-    //   _id: userId,
-    //   username: username,
-    // };
+    const user = { UserId, FirstName, LastName };
 
     // const accessToken = generateAccessToken(user);
     // const refreshToken = generateRefreshToken(user);
 
-    res.status(200).json({ success: true, data: {} });
+    res.status(200).json({ success: true, data: { user } });
     // .json({ success: true, data: { accessToken, refreshToken } });
   } catch (err) {
     next(err);

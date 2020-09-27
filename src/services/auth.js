@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import config from '../config';
 
 import { Logger } from '../middleware/logger';
 import { findUserByUsername } from './user';
@@ -18,8 +19,10 @@ const verifyUser = async (username, password) => {
     }
 
     const isUserValid = await verifyPassword(password, user.Password);
+
+    const { UserId, FirstName, LastName } = user;
     if (isUserValid) {
-      return user.UserId;
+      return { UserId, FirstName, LastName };
     }
     return false;
   } catch (error) {

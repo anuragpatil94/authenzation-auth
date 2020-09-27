@@ -3,6 +3,7 @@ import { Logger } from '../middleware/logger';
 import { InternalServerError } from '../util';
 import { db } from '../middleware/database';
 import { authServices } from '.';
+import config from '../config';
 
 export const createUser = async ({
   firstName,
