@@ -9,33 +9,33 @@ class Schema {
 }
 
 const SignUpSchema = Joi.object({
-  firstName: Joi.string().alphanum().required(),
-  lastName: Joi.string().alphanum().required(),
+  FirstName: Joi.string().alphanum().required(),
+  LastName: Joi.string().alphanum().required(),
   // middleName: Joi.string().alphanum(),
-  username: Joi.string().alphanum().required(),
-  password: Joi.string().min(6).required().strict(),
+  Username: Joi.string().alphanum().required(),
+  Password: Joi.string().min(6).required().strict(),
   // confirmPassword: Joi.string().valid(Joi.ref('password')).required().strict(),
 });
 
 const SignInSchema = Joi.object({
   // authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
-  username: Joi.string().alphanum().required(),
-  password: Joi.string().required().strict(),
+  Username: Joi.string().alphanum().required(),
+  Password: Joi.string().required().strict(),
 });
 
 export default {
   [constants.APIROUTES.AUTH.SIGNUP]: new Schema(SignUpSchema, {
     body: [
-      'firstName',
-      'lastName',
+      'FirstName',
+      'LastName',
       // 'middleName',
-      'username',
-      'password',
+      'Username',
+      'Password',
       // 'confirmPassword',
     ],
   }),
   [constants.APIROUTES.AUTH.SIGNIN]: new Schema(SignInSchema, {
     // headers: ['authtype'],
-    body: ['username', 'password'],
+    body: ['Username', 'Password'],
   }),
 };
