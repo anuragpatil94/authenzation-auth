@@ -14,6 +14,11 @@ export const APIROUTES = {
   },
 };
 
+export const AUTHTYPE = {
+  JWT: 'JWT',
+  BASIC: 'basic',
+};
+
 export const COLLECTION = {
   USERS: 'users',
 };

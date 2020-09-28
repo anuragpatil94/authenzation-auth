@@ -18,7 +18,7 @@ const SignUpSchema = Joi.object({
 });
 
 const SignInSchema = Joi.object({
-  // authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
+  authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
   Username: Joi.string().alphanum().required(),
   Password: Joi.string().required().strict(),
 });
@@ -35,7 +35,7 @@ export default {
     ],
   }),
   [constants.APIROUTES.AUTH.SIGNIN]: new Schema(SignInSchema, {
-    // headers: ['authtype'],
+    headers: ['authtype'],
     body: ['Username', 'Password'],
   }),
 };

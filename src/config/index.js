@@ -37,9 +37,10 @@ export default {
     authPassword: config.parsed.PGSQL_AUTH_PASSWORD,
     authDatabaseName: config.parsed.PGSQL_AUTH_DATABASE_NAME,
   },
-  // jwt: {
-  //   accessTokenSecret: config.parsed.ACCESS_TOKEN_SECRET,
-  //   accessTokenExpiration: config.parsed.ACCESS_TOKEN_EXPIRATION,
-  //   refreshTokenSecret: config.parsed.REFRESH_TOKEN_SECRET,
-  // },
+  jwt: {
+    accessTokenSecret: config.parsed.ACCESS_TOKEN_SECRET,
+    accessTokenExpiration: config.parsed.ACCESS_TOKEN_EXPIRATION,
+    refreshTokenExpiration: config.parsed.REFRESH_TOKEN_EXPIRATION,
+    refreshTokenSecret: config.parsed.REFRESH_TOKEN_SECRET,
+  },
 };

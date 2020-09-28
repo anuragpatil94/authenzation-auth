@@ -1,5 +1,8 @@
 import bcrypt from 'bcrypt';
+import { v4 } from 'uuid';
+
 import config from '../config';
+import { db } from '../middleware/database';
 
 import { Logger } from '../middleware/logger';
 import { findUserByUsername } from './user';
@@ -31,6 +34,19 @@ const verifyUser = async (username, password) => {
   }
 };
 
+const setToken = async ({ userId, accessToken, refreshToken }) => {
+  const id = v4();
+  const { TokenId } = await db.one(`
+    insert into 
+    tokens ("TokenId", "UserId", "AccessToken", "RefreshToken") 
+    values ('${id}','${userId}','${accessToken}','${refreshToken}') returning "TokenId";`);
+
+  if (TokenId) {
+    return true;
+  }
+  return false;
+};
+
 const encryptPassword = async password => {
   // Salt Rounds to generate Salt
   const saltRounds = 10;
@@ -49,4 +65,4 @@ const verifyPassword = async (password, hash) => {
   return result;
 };
 
-export { verifyUser, encryptPassword };
+export { verifyUser, encryptPassword, setToken };

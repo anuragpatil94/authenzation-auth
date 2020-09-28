@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import { authServices, userServices } from '../../services';
 import { Logger } from '../../middleware/logger';
-import { ErrorHandler } from '../../util';
+import { constants, ErrorHandler, InternalServerError } from '../../util';
 import config from '../../config';
 import { create } from 'lodash';
 
@@ -44,9 +44,7 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res, next) => {
   try {
     const requestData = req.body;
-    const { Username, Password } = requestData;
-    // TODO: Use AuthType
-    // const authType = authtype;
+    const { Username, Password, authtype } = requestData;
 
     // Verify if user is in database and correct credentials
     const { UserId, FirstName, LastName } = await authServices.verifyUser(
@@ -63,13 +61,33 @@ export const signin = async (req, res, next) => {
     // TODO: Step2 - Session
     // TODO: Step3 - Cookie Authentication
 
+    let data = {};
+
     const user = { UserId, FirstName, LastName };
 
-    // const accessToken = generateAccessToken(user);
-    // const refreshToken = generateRefreshToken(user);
+    if (authtype === constants.AUTHTYPE.JWT) {
+      // Generate Access Token and Refresh Token
+      const accessToken = generateToken(user, config.jwt.accessTokenExpiration);
+      const refreshToken = generateToken(
+        user,
+        config.jwt.refreshTokenExpiration,
+      );
+      // Save the token in database
+      const isTokenSet = await authServices.setToken({
+        userId: UserId,
+        accessToken,
+        refreshToken,
+      });
 
-    res.status(200).json({ success: true, data: { user } });
-    // .json({ success: true, data: { accessToken, refreshToken } });
+      if (!isTokenSet) {
+        throw new InternalServerError('Cannot Set Token');
+      }
+      data = { accessToken, refreshToken };
+    } else if (authType === constants.AUTHTYPE.BASIC) {
+      data = { ...data, user };
+    }
+
+    res.status(200).json({ success: true, data });
   } catch (err) {
     next(err);
   }
@@ -82,10 +100,7 @@ export const signout = (req, res, next) => {
  * Helper Methods
  */
 // Generate Tokens
-const generateAccessToken = user =>
+const generateToken = (user, expireTime) =>
   jwt.sign(user, config.jwt.accessTokenSecret, {
-    expiresIn: config.jwt.accessTokenExpiration,
+    expiresIn: expireTime,
   });
-
-const generateRefreshToken = user =>
-  jwt.sign(user, config.jwt.refreshTokenSecret);
