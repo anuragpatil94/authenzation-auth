@@ -4,7 +4,6 @@ import { authServices, userServices } from '../../services';
 import { Logger } from '../../middleware/logger';
 import { constants, ErrorHandler, InternalServerError } from '../../util';
 import config from '../../config';
-import { create } from 'lodash';
 
 export const signup = async (req, res, next) => {
   try {
@@ -57,7 +56,7 @@ export const signin = async (req, res, next) => {
       throw new ErrorHandler(401, 'User Credentials Invalid!');
     }
 
-    // TODO: Step1 - JWT
+    // Step1 - JWT
     // TODO: Step2 - Session
     // TODO: Step3 - Cookie Authentication
 
@@ -67,23 +66,21 @@ export const signin = async (req, res, next) => {
 
     if (authtype === constants.AUTHTYPE.JWT) {
       // Generate Access Token and Refresh Token
-      const accessToken = generateToken(user, config.jwt.accessTokenExpiration);
-      const refreshToken = generateToken(
-        user,
-        config.jwt.refreshTokenExpiration,
-      );
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+
       // Save the token in database
-      const isTokenSet = await authServices.setToken({
-        userId: UserId,
+      const isTokenSet = await authServices.setToken(
+        UserId,
         accessToken,
         refreshToken,
-      });
+      );
 
       if (!isTokenSet) {
         throw new InternalServerError('Cannot Set Token');
       }
       data = { accessToken, refreshToken };
-    } else if (authType === constants.AUTHTYPE.BASIC) {
+    } else if (authtype === constants.AUTHTYPE.BASIC) {
       data = { ...data, user };
     }
 
@@ -96,11 +93,52 @@ export const signout = (req, res, next) => {
   res.status(200).json({ message: 'This is Logout Route' });
 };
 
+export const getNewTokens = async (req, res, next) => {
+  try {
+    const requestData = req.body;
+    const { token, tokenData } = requestData;
+    const { UserId, FirstName, LastName } = tokenData;
+
+    // Find Token in Database
+    const prevTokenId = await authServices.verifyRefreshToken(UserId, token);
+
+    if (!prevTokenId) {
+      throw new Error('Invalid Token For User');
+    }
+
+    // Create New Tokens
+    const accessToken = generateAccessToken({ UserId, FirstName, LastName });
+    const refreshToken = generateRefreshToken({ UserId, FirstName, LastName });
+
+    // Set New Tokens
+    const areNewTokensSet = await authServices.setToken(
+      UserId,
+      accessToken,
+      refreshToken,
+      prevTokenId,
+    );
+    if (!areNewTokensSet) {
+      throw new Error('New Tokens Not Set');
+    }
+
+    // Return New Tokens
+    res
+      .status(200)
+      .json({ success: true, data: { accessToken, refreshToken } });
+  } catch (err) {
+    next(err);
+  }
+};
+
 /**
  * Helper Methods
  */
 // Generate Tokens
-const generateToken = (user, expireTime) =>
-  jwt.sign(user, config.jwt.accessTokenSecret, {
-    expiresIn: expireTime,
+const generateAccessToken = data =>
+  jwt.sign(data, config.jwt.accessTokenSecret, {
+    expiresIn: config.jwt.accessTokenExpiration,
+  });
+const generateRefreshToken = data =>
+  jwt.sign(data, config.jwt.refreshTokenSecret, {
+    expiresIn: config.jwt.refreshTokenExpiration,
   });

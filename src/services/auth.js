@@ -5,6 +5,7 @@ import config from '../config';
 import { db } from '../middleware/database';
 
 import { Logger } from '../middleware/logger';
+import { ErrorHandler } from '../util';
 import { findUserByUsername } from './user';
 
 /**
@@ -34,17 +35,47 @@ const verifyUser = async (username, password) => {
   }
 };
 
-const setToken = async ({ userId, accessToken, refreshToken }) => {
+const setToken = async (
+  userId,
+  accessToken,
+  refreshToken,
+  prevTokenId = null,
+) => {
   const id = v4();
   const { TokenId } = await db.one(`
     insert into 
     tokens ("TokenId", "UserId", "AccessToken", "RefreshToken") 
-    values ('${id}','${userId}','${accessToken}','${refreshToken}') returning "TokenId";`);
+    values ('${
+      prevTokenId || id
+    }','${userId}','${accessToken}','${refreshToken}')
+    on conflict ("TokenId")
+    do
+    update set 
+      "AccessToken" = '${accessToken}', 
+      "RefreshToken" = '${refreshToken}'
+    returning "TokenId";`);
 
   if (TokenId) {
     return true;
   }
   return false;
+};
+
+const verifyRefreshToken = async (UserId, token) => {
+  try {
+    const { TokenId } = await db.one(
+      `select * from tokens where "UserId" = '${UserId}' AND "RefreshToken" = '${token}';`,
+    );
+    console.log(TokenId);
+
+    if (TokenId) {
+      return TokenId;
+    }
+    return false;
+  } catch (err) {
+    Logger.error('Invalid Refresh Token');
+    throw new ErrorHandler(401, `Invalid Token`);
+  }
 };
 
 const encryptPassword = async password => {
@@ -65,4 +96,4 @@ const verifyPassword = async (password, hash) => {
   return result;
 };
 
-export { verifyUser, encryptPassword, setToken };
+export { verifyUser, encryptPassword, setToken, verifyRefreshToken };

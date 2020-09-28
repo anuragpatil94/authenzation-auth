@@ -11,6 +11,7 @@ export const APIROUTES = {
     SELF: '/auth',
     SIGNUP: '/signup',
     SIGNIN: '/signin',
+    TOKEN: '/token',
   },
 };
 

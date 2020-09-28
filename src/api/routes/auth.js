@@ -5,7 +5,7 @@ import { constants } from '../../util';
 const route = Router();
 
 export default app => {
-  const { SELF, SIGNUP, SIGNIN } = constants.APIROUTES.AUTH;
+  const { SELF, SIGNUP, SIGNIN, TOKEN } = constants.APIROUTES.AUTH;
 
   app.use(SELF, route);
 
@@ -25,5 +25,12 @@ export default app => {
     SIGNIN,
     APIMiddlewares.SchemaValidator,
     APIControllers.AuthController.signin,
+  );
+
+  route.post(
+    TOKEN,
+    APIMiddlewares.SchemaValidator,
+    APIMiddlewares.VerifyToken,
+    APIControllers.AuthController.getNewTokens,
   );
 };

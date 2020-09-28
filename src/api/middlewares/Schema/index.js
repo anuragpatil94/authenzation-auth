@@ -18,24 +18,27 @@ const SignUpSchema = Joi.object({
 });
 
 const SignInSchema = Joi.object({
-  authtype: Joi.string().alphanum().valid('JWT', 'SESSION', 'BASIC').required(),
+  authtype: Joi.string()
+    .alphanum()
+    .valid(constants.AUTHTYPE.BASIC, constants.AUTHTYPE.JWT)
+    .default(constants.AUTHTYPE.BASIC),
   Username: Joi.string().alphanum().required(),
   Password: Joi.string().required().strict(),
 });
 
+const TokenSchema = Joi.object({
+  authorization: Joi.string().required(),
+});
+
 export default {
   [constants.APIROUTES.AUTH.SIGNUP]: new Schema(SignUpSchema, {
-    body: [
-      'FirstName',
-      'LastName',
-      // 'middleName',
-      'Username',
-      'Password',
-      // 'confirmPassword',
-    ],
+    body: ['FirstName', 'LastName', 'Username', 'Password'],
   }),
   [constants.APIROUTES.AUTH.SIGNIN]: new Schema(SignInSchema, {
     headers: ['authtype'],
     body: ['Username', 'Password'],
+  }),
+  [constants.APIROUTES.AUTH.TOKEN]: new Schema(TokenSchema, {
+    headers: ['authorization'],
   }),
 };
