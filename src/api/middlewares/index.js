@@ -1,8 +1,10 @@
+import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 
 import { Logger } from '../../middleware/logger';
 import Schema from './Schema';
 import { ErrorHandler } from '../../util';
+import config from '../../config';
 
 export const SchemaValidator = async (req, res, next) => {
   try {
@@ -37,6 +39,13 @@ export const SchemaValidator = async (req, res, next) => {
       for (const key in requestDataMapping) {
         if (requestDataMapping.hasOwnProperty(key)) {
           const value = requestDataMapping[key];
+          if (config.env.isDevelopment) {
+            Logger.debug(
+              `${key} => Required ${JSON.stringify(value)} | ${JSON.stringify(
+                _.pick(req[key], value),
+              )}`,
+            );
+          }
           const formattedObject = _.pick(req[key], value);
           body = { ...body, ...formattedObject };
         }
@@ -55,11 +64,30 @@ export const SchemaValidator = async (req, res, next) => {
     }
   } catch (err) {
     // TODO: Better Error Handling For example password=confirmPassword
+    Logger.error(err.message);
     next(
       new ErrorHandler(
         422,
         'Invalid request data. Please review request and try again.',
       ),
     );
+  }
+};
+
+export const VerifyToken = async (req, res, next) => {
+  try {
+    Logger.info('Verifying Token');
+    const requestData = req.body;
+    const { authorization } = requestData;
+    const token = authorization.split(' ')[1];
+    // Verify Token
+    const user = jwt.verify(token, config.jwt.refreshTokenSecret);
+
+    req.body.token = token;
+    req.body.tokenData = user;
+    next();
+  } catch (error) {
+    Logger.error(error.message);
+    next(new ErrorHandler(500, 'Unable to Verify Token'));
   }
 };

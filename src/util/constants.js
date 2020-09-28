@@ -11,7 +11,13 @@ export const APIROUTES = {
     SELF: '/auth',
     SIGNUP: '/signup',
     SIGNIN: '/signin',
+    TOKEN: '/token',
   },
+};
+
+export const AUTHTYPE = {
+  JWT: 'JWT',
+  BASIC: 'basic',
 };
 
 export const COLLECTION = {
