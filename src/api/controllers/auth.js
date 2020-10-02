@@ -60,10 +60,9 @@ export const signin = async (req, res, next) => {
     // TODO: Step2 - Session
     // TODO: Step3 - Cookie Authentication
 
-    let data = {};
-
     const user = { UserId, FirstName, LastName };
 
+    let data = {};
     if (authtype === constants.AUTHTYPE.JWT) {
       // Generate Access Token and Refresh Token
       const accessToken = generateAccessToken(user);
@@ -79,9 +78,9 @@ export const signin = async (req, res, next) => {
       if (!isTokenSet) {
         throw new InternalServerError('Cannot Set Token');
       }
-      data = { accessToken, refreshToken };
+      data = { ...data, authType, tokens: { accessToken, refreshToken } };
     } else if (authtype === constants.AUTHTYPE.BASIC) {
-      data = { ...data, user };
+      data = { ...data, authType, user };
     }
 
     res.status(200).json({ success: true, data });
