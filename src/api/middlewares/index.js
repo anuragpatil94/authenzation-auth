@@ -88,6 +88,6 @@ export const VerifyToken = async (req, res, next) => {
     next();
   } catch (error) {
     Logger.error(error.message);
-    next(new ErrorHandler(500, 'Unable to Verify Token'));
+    next(new ErrorHandler(500, 'Token Verification Failed!'));
   }
 };
