@@ -78,9 +78,13 @@ export const signin = async (req, res, next) => {
       if (!isTokenSet) {
         throw new InternalServerError('Cannot Set Token');
       }
-      data = { ...data, authType, tokens: { accessToken, refreshToken } };
+      data = {
+        ...data,
+        authType: authtype,
+        tokens: { accessToken, refreshToken },
+      };
     } else if (authtype === constants.AUTHTYPE.BASIC) {
-      data = { ...data, authType, user };
+      data = { ...data, authType: authtype, user };
     }
 
     res.status(200).json({ success: true, data });
