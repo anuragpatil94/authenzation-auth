@@ -94,7 +94,11 @@ export const signin = async (req, res, next) => {
   }
 };
 export const signout = (req, res, next) => {
-  res.status(200).json({ message: 'This is Logout Route' });
+  let data = {};
+
+  console.log(req.body);
+
+  res.status(200).json({ success: true, data });
 };
 
 export const forgetPasswordSendMail = async (req, res, next) => {
