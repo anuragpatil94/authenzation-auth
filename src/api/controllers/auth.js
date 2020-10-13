@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 import { authServices, userServices } from '../../services';
 import { Logger } from '../../middleware/logger';
@@ -94,6 +95,37 @@ export const signin = async (req, res, next) => {
 };
 export const signout = (req, res, next) => {
   res.status(200).json({ message: 'This is Logout Route' });
+};
+
+export const forgetPasswordSendMail = async (req, res, next) => {
+  try {
+    //     console.log(req.body.Username);
+
+    //     let testAccount = await nodemailer.createTestAccount();
+
+    //     let transporter = nodemailer.createTransport({
+    //       host: 'smtp.ethereal.email',
+    //       port: 587,
+    //       secure: false, // true for 465, false for other ports
+    //       auth: {
+    //         user: testAccount.user, // generated ethereal user
+    //         pass: testAccount.pass, // generated ethereal password
+    //       },
+    //     });
+    //     // send mail with defined transport object
+    //     let info = await transporter.sendMail({
+    //       from: '"Fred Foo 👻" <>', // sender address
+    //       to: '', // list of receivers
+    //       subject: 'Hello ✔', // Subject line
+    //       text: 'Hello world?', // plain text body
+    //       html: '<b>Hello world?</b>', // html body
+    //     });
+    //     console.log(info.messageId);
+
+    res.status(200).json({ success: true });
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const getNewTokens = async (req, res, next) => {

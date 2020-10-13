@@ -26,6 +26,10 @@ const SignInSchema = Joi.object({
   Password: Joi.string().required().strict(),
 });
 
+const ForgetPasswordSchema = Joi.object({
+  Username: Joi.string().alphanum().required(),
+});
+
 const TokenSchema = Joi.object({
   authorization: Joi.string().required(),
 });
@@ -40,5 +44,8 @@ export default {
   }),
   [constants.APIROUTES.AUTH.TOKEN]: new Schema(TokenSchema, {
     headers: ['authorization'],
+  }),
+  [constants.APIROUTES.AUTH.FORGETPASSWORD]: new Schema(ForgetPasswordSchema, {
+    body: ['Username'],
   }),
 };
